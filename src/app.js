@@ -5,6 +5,12 @@ const { default: helmet } = require('helmet')
 const morgan = require('morgan')
 const app = express()
 
+
+app.use(express.json())
+app.use(express.urlencoded({
+    extended: true
+}))
+
 // init middleware
 app.use(morgan("dev"))
 app.use(helmet())
@@ -16,6 +22,7 @@ require('./dbs/init.mongodb')
 // checkOverload()
 
 // init router
+app.use('/', require('./routes'))
 
 // handle error
 
