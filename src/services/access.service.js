@@ -1,6 +1,9 @@
 const shopModel = require('../models/shop.model')
 const bcrypt = require('bcrypt')
 const crypto = require('crypto')
+const keyTokenService = require('./keyToken.service')
+const { createTokenPair } = require('../auth/authUtils')
+const { pickFields } = require('../utils')
 
 const RoleShop = {
     SHOP: 'SHOP',
@@ -30,11 +33,36 @@ class AccessService {
             // register token
             if (newShop) {
                 // create privateKey, publicKey
-                const { privateKey, publicKey } = crypto.generateKeyPairSync('rsa', {
-                    modulusLength: 4096
-                })
+                // simple key
+                const privateKey = crypto.randomBytes(64).toString('hex')
+                const publicKey = crypto.randomBytes(64).toString('hex')
+
                 // save collection KeyStore
-                console.log({ privateKey, publicKey });
+                const keyStore = await keyTokenService.createKeyToken({
+                    userId: newShop._id,
+                    publicKey,
+                    privateKey
+                })
+
+                if (!keyStore) {
+                    return {
+                        code: 'xxx',
+                        message: 'Error create key token!',
+                    }
+                }
+                // create token
+                const token = await createTokenPair({ userId: newShop._id, email }, publicKey, privateKey)
+                return {
+                    code: 201,
+                    metadata: {
+                        shop: pickFields({ fields: ['_id', 'name', 'email'], object: newShop }),
+                        token
+                    }
+                }
+            }
+            return {
+                code: 200,
+                metadata: null
             }
 
         } catch (error) {
