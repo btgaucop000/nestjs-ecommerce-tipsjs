@@ -3,6 +3,7 @@
 ### sign up
 POST {{url_dev}}/shop/sign-up
 Content-Type: application/json
+x-api-key: 5f854599b2175ed01ea5e5c42f525980585bba8d8a46e5bed1327c2efa2a310ddc48d546527720c7ef72a735012dbcf9317b6c158253c33a83d1a0f04dcfe60b
 
 {
     "name": "bfdestiny",
